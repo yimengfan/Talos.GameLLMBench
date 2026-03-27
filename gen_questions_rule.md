@@ -1,3 +1,5 @@
+# 该文件答题时禁止阅读!!!!
+
 # Unity3D 2022 LLM 能力考察规范 v5.0 出题模型：MiniMax-2.7
 题目输出到:./questions.md（1000题）
 答案输出到:./answers.md
