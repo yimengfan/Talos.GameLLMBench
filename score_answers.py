@@ -77,7 +77,7 @@ def parse_llm_answers(filepath):
                 qnum = int(m.group(1))
                 answers[qnum] = m.group(2).upper()
                 analysis = m.group(3).strip()
-                has_analysis[qnum] = len(analysis) >= 10
+                has_analysis[qnum] = len(analysis) >= 20
             else:
                 m2 = re.match(r"Q(\d+)\.\s*([A-D])\s*$", line, re.IGNORECASE)
                 if m2:
