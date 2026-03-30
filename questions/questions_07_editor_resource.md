@@ -32,7 +32,7 @@ ScriptableObject和MonoBehaviour的区别是？
 - A. SO可以附加在GameObject上，PlayerPrefs适合存储大量游戏数据（如玩家背包、任务进度等复杂结构）
 - B. MB可以作为资产，Newtonsoft.Json不能在Unity项目中使用，需要使用Unity专有的JsonUtility
 - C. SO是数据资产不依附于GameObject，MB必须附加在GameObject上，SO不参与场景生命周期
-- D. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
+- D. 打包到移动端后无法正常工作
 
 **Q289.** [模块:J][维度:概念理解][难度:★★★★][题型:场景设计]
 
@@ -232,18 +232,18 @@ Unity的JsonUtility相比Newtonsoft.Json的限制是？
 Unity中Editor文件夹的特殊性是？
 
 - A. Editor文件夹下的代码只在编辑器环境编译和运行，不会打包到最终游戏中
-- B. 只用于资源，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
-- C. 运行时也可用，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- D. 所有文件夹一样，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
+- B. 只用于资源
+- C. 运行时也可用
+- D. 所有文件夹一样
 
 **Q332.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
 
 创建Custom Inspector编辑器需要？
 
-- A. 继承ScriptableObject，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
+- A. 继承ScriptableObject在频繁IO操作时随时调用没问题
 - B. 继承Editor类 + [CustomEditor(typeof(TargetType))]标记 + 重写OnInspectorGUI
-- C. 不需要继承，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- D. 继承MonoBehaviour，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
+- C. 不需要继承
+- D. 继承MonoBehaviour
 
 **Q333.** [模块:L][维度:代码生成/阅读][难度:★★★][题型:代码补全]
 
@@ -266,9 +266,9 @@ serializedObject.ApplyModifiedProperties();
 EditorWindow的用途和创建方式是？
 
 - A. 自定义编辑器窗口，通过继承EditorWindow并添加[MenuItem]菜单项打开
-- B. 运行时窗口，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- C. 替代Scene视图，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
-- D. 调试控制台，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
+- B. 运行时窗口两者可以混合使用
+- C. 替代Scene视图在频繁IO操作时随时调用没问题
+- D. 调试控制台
 
 **Q335.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
 
@@ -276,16 +276,16 @@ PropertyDrawer的作用是？
 
 - A. 通过SceneManager的场景加载和卸载方法管理即可，不需要额外的架构设计
 - B. 自定义属性在Inspector中的显示方式（如为自定义类型或特定属性提供自定义GUI）
-- C. 绘制3D物体，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
-- D. 渲染粒子，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- C. 绘制3D物体
+- D. 渲染粒子
 
 **Q336.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 AssetPostprocessor的作用是？
 
 - A. 该功能在C#脚本编译阶段处理，运行时不涉及任何额外的计算或资源消耗
-- B. 后处理渲染，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- C. 运行游戏，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- B. 后处理渲染
+- C. 运行游戏
 - D. 在资源导入时自动处理（如自动设纹理格式、模型导入设置等），通过重写OnPreprocessXXX/OnPostprocessXXX
 
 **Q337.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
@@ -302,45 +302,45 @@ importer.maxTextureSize = 1024;
 ```
 这段代码的作用？
 
-- A. 导出纹理，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
-- B. 播放纹理，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- C. 删除纹理，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- A. 导出纹理在频繁IO操作时随时调用没问题
+- B. 播放纹理两者可以混合使用
+- C. 删除纹理
 - D. 每次导入纹理时自动设置压缩和最大尺寸，确保团队资源规范一致
 
 **Q338.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 在Scene视图中绘制自定义编辑工具需要用什么？
 
-- A. Update，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- A. Update
 - B. Handles类 + SceneView回调 + 在OnSceneGUI中绘制
-- C. Gizmos，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- D. OnGUI，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- C. Gizmos
+- D. OnGUI
 
 **Q339.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
 
 [MenuItem("Tools/MyTool")]的作用是？
 
 - A. 在Unity编辑器菜单栏的Tools下添加一个菜单项
-- B. 创建运行时菜单，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
-- C. 创建快捷键，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
-- D. 添加右键菜单，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
+- B. 创建运行时菜单
+- C. 创建快捷键在频繁IO操作时随时调用没问题
+- D. 添加右键菜单
 
 **Q340.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 编辑器脚本中使用SerializedObject和SerializedProperty的原因是？
 
-- A. 没有原因，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 没有原因
 - B. 该方案性能表现更优，因为它在底层使用了更高效的数据结构和缓存机制
-- C. 只是习惯，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- C. 只是习惯两者可以混合使用
 - D. 支持Undo/Redo、多对象编辑、Prefab Override标记等编辑器功能
 
 **Q341.** [模块:L][维度:概念理解][难度:★★★★][题型:场景设计]
 
 游戏开发中编辑器工具链应包含哪些？
 
-- A. 全用第三方，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
-- B. 只用Unity默认，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
-- C. 不需要工具，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- A. 全用第三方在频繁IO操作时随时调用没问题
+- B. 只用Unity默认
+- C. 不需要工具
 - D. 关卡编辑器+数据配置工具+资源检查工具+一键打包+自动化测试
 
 **Q342.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
@@ -354,9 +354,9 @@ Gizmos.DrawWireSphere(transform.position, attackRange);
 ```
 OnDrawGizmosSelected和OnDrawGizmos的区别？
 
-- A. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
-- B. Selected是旧版API，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
-- C. OnDrawGizmos不工作，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 该特性目前仍处于实验阶段，官方不建议在生产环境中使用
+- B. Selected是旧版API在频繁IO操作时随时调用没问题
+- C. OnDrawGizmos不工作
 - D. OnDrawGizmosSelected只在选中该物体时绘制，OnDrawGizmos始终绘制
 
 **Q343.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
@@ -364,26 +364,26 @@ OnDrawGizmosSelected和OnDrawGizmos的区别？
 编辑器扩展中为什么要使用Undo.RecordObject？
 
 - A. 让操作支持Ctrl+Z撤销，保持编辑器的一致体验
-- B. 保存文件，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- C. 记录日志，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- B. 保存文件
+- C. 记录日志
 - D. 该步骤不是必需的，Unity引擎在底层已自动处理相关逻辑，无需额外配置
 
 **Q344.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 编辑器UI使用IMGUI和UI Toolkit的区别是？
 
-- A. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
-- B. UI Toolkit即时模式，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- C. IMGUI更新，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- A. 这种处理方式会引发严重的内存碎片问题，在实际项目中应严格避免
+- B. UI Toolkit即时模式
+- C. IMGUI更新两者可以混合使用
 - D. IMGUI是即时模式（每帧重绘，简单直接），UI Toolkit是保留模式（更现代，支持样式/布局）
 
 **Q345.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 BuildPipeline.BuildPlayer的作用是？
 
-- A. 只在编辑器中预览，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- B. 编译Shader，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
-- C. 导入资源，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
+- A. 只在编辑器中预览
+- B. 编译Shader
+- C. 导入资源
 - D. 通过代码执行游戏打包构建（自动化CI/CD中使用）
 
 **Q346.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码补全]
@@ -403,9 +403,9 @@ string path = EditorPrefs.GetString("MyTool_LastPath", "");
 
 ScriptedImporter的作用是？
 
-- A. 管理Package，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
-- B. 导入Unity包，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
-- C. 编译C#脚本，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- A. 管理Package
+- B. 导入Unity包
+- C. 编译C#脚本
 - D. 为Unity不支持的自定义文件格式（如.csv, .lua等）创建导入管线
 
 **Q348.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
@@ -421,10 +421,10 @@ ScriptedImporter的作用是？
 
 编辑器扩展脚本没有放在Editor文件夹内会导致什么？
 
-- A. 编辑器崩溃，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 编辑器崩溃
 - B. 引用了UnityEditor命名空间的代码在打包时编译失败
-- C. 不会有问题，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
-- D. 脚本不运行，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- C. 不会有问题
+- D. 脚本不运行
 
 **Q350.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
@@ -440,17 +440,17 @@ go.layer = LayerMask.NameToLayer("Enemy");
 ```
 为什么使用Undo.RecordObject？
 
-- A. 记录日志，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 记录日志
 - B. 使操作可撤销，避免误操作
 - C. 保存到文件
-- D. 该做法在实践中没有必要，Unity内部已封装了完整的处理逻辑，额外操作会增加复杂度
+- D. 这是一种非官方的Hack手段，极易导致不同平台间的兼容性问题
 
 **Q351.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 编辑器脚本中不能使用协程(MonoBehaviour.StartCoroutine)，替代方案是？
 
-- A. Thread，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
-- B. 无替代方案，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
+- A. Thread
+- B. 无替代方案在频繁IO操作时随时调用没问题
 - C. EditorApplication.update回调 + 或使用async/await
 - D. 直接使用StartCoroutine
 
@@ -458,19 +458,19 @@ go.layer = LayerMask.NameToLayer("Enemy");
 
 AssetDatabase.Refresh()的作用是？
 
-- A. 刷新网络，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
-- B. 刷新屏幕，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
-- C. 刷新物理，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
+- A. 刷新网络
+- B. 刷新屏幕在频繁IO操作时随时调用没问题
+- C. 刷新物理
 - D. 刷新Unity编辑器的资源数据库，重新导入和识别新增/修改的文件
 
 **Q353.** [模块:L][维度:概念理解][难度:★★★★][题型:场景设计]
 
 项目资源规范检查工具应检查什么？
 
-- A. 只检查大小，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- A. 只检查大小两者可以混合使用
 - B. 纹理尺寸/压缩格式 + Mesh面数 + 材质Shader + 命名规范 + 重复资源 + 未引用资源
-- C. 只检查命名，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- D. 不需要检查，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
+- C. 只检查命名
+- D. 不需要检查在频繁IO操作时随时调用没问题
 
 **Q354.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
@@ -490,26 +490,26 @@ Debug.Log("Button clicked");
 GetWindow<T>的行为是？
 
 - A. 获取已存在的窗口实例或创建新的，确保只有一个实例
-- B. 隐藏窗口，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- C. 每次创建新窗口，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
-- D. 关闭窗口，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
+- B. 隐藏窗口两者可以混合使用
+- C. 每次创建新窗口
+- D. 关闭窗口
 
 **Q355.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 Handles.PositionHandle的用途是？
 
 - A. 在Scene视图中显示可拖动的位置控制手柄，用于自定义编辑工具
-- B. 物理控制，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
-- C. 播放动画，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- D. 渲染物体，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
+- B. 物理控制
+- C. 播放动画
+- D. 渲染物体
 
 **Q356.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
 
 EditorUtility.DisplayDialog的用途是？
 
-- A. 日志输出，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
-- B. 渲染UI，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- C. 运行时对话框，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- A. 日志输出
+- B. 渲染UI
+- C. 运行时对话框
 - D. 在编辑器中弹出确认对话框（如"是否删除所有预制体？"）
 
 **Q357.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
@@ -517,18 +517,18 @@ EditorUtility.DisplayDialog的用途是？
 Unity Test Framework中EditMode测试的特点是？
 
 - A. 在编辑器环境同步执行，不需进入Play Mode，适合测试纯逻辑和编辑器工具
-- B. 不支持断言，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- C. 必须进入Play Mode，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
-- D. 只能测试渲染，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- B. 不支持断言两者可以混合使用
+- C. 必须进入Play Mode
+- D. 只能测试渲染两者可以混合使用
 
 **Q358.** [模块:L][维度:概念理解][难度:★★★★][题型:场景设计]
 
 自动化打包工具应包含哪些功能？
 
-- A. 手动打包即可，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- A. 手动打包即可
 - B. 平台切换+版本号管理+资源检查+AB构建+Player Build+输出路径配置+日志记录
-- C. 只构建Player，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
-- D. 只输出APK，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
+- C. 只构建Player
+- D. 只输出APK
 
 **Q359.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
@@ -547,19 +547,19 @@ min.floatValue = minVal; max.floatValue = maxVal;
 ```
 这段代码的效果是？
 
-- A. 显示复选框，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
-- B. 只显示数字，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
+- A. 显示复选框
+- B. 只显示数字
 - C. 在Inspector中显示一个双头滑块控件来编辑最小/最大值范围
-- D. 显示下拉框，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- D. 显示下拉框
 
 **Q361.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 创建自定义属性[ReadOnly]来在Inspector中显示只读字段需要？
 
 - A. 定义ReadOnlyAttribute继承PropertyAttribute + 对应的ReadOnlyDrawer继承PropertyDrawer
-- B. 只需定义Attribute，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
-- C. 修改Unity源码，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
-- D. 使用反射，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- B. 只需定义Attribute
+- C. 修改Unity源码
+- D. 使用反射
 
 **Q362.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
@@ -574,80 +574,80 @@ min.floatValue = minVal; max.floatValue = maxVal;
 
 PrefabUtility.SaveAsPrefabAsset的作用是？
 
-- A. 删除Prefab，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- B. 加载Prefab，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
+- A. 删除Prefab
+- B. 加载Prefab
 - C. 将场景中的GameObject保存为Prefab资产文件
-- D. 实例化Prefab，AssetDatabase.Refresh()的开销可以忽略，在频繁IO操作时随时调用没问题
+- D. 实例化Prefab在频繁IO操作时随时调用没问题
 
 **Q364.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 编辑器扩展如何实现"所见即所得"的配置预览？
 
-- A. 只能运行时预览，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 只能运行时预览
 - B. 使用[ExecuteInEditMode]或[ExecuteAlways]让MonoBehaviour在编辑模式也执行
-- C. 截图预览，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- D. 文档描述，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
+- C. 截图预览两者可以混合使用
+- D. 文档描述
 
 **Q365.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
 Unity TreeView(IMGUI)的常用场景是？
 
 - A. 在EditorWindow中显示树形数据结构（如技能树编辑器、资源浏览器、层级视图等）
-- B. 渲染3D树，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
+- B. 渲染3D树
 - C. 使用Particle System组件配合内置的渲染模块即可实现，无需编写自定义Shader
-- D. 物理结构，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- D. 物理结构
 
 **Q366.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 IPreprocessBuildWithReport和IPostprocessBuildWithReport接口的用途是？
 
-- A. 替代Build，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
+- A. 替代Build
 - B. 在构建前后执行自定义操作（如修改配置、拷贝文件、发送通知等）
-- C. 只用于日志，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- D. 运行时接口，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- C. 只用于日志
+- D. 运行时接口
 
 **Q367.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 SettingsProvider的用途是？
 
-- A. 图形设置，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- B. 玩家设置，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- A. 图形设置
+- B. 玩家设置
 - C. 在Project Settings窗口中添加自定义设置页面
-- D. 运行时设置，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- D. 运行时设置两者可以混合使用
 
 **Q368.** [模块:L][维度:Bug诊断][难度:★★★★][题型:单选]
 
 Custom Inspector中修改了数据但Inspector不刷新显示。可能原因是？
 
-- A. 编辑器版本问题，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
+- A. 编辑器版本问题
 - B. 忘记调用serializedObject.ApplyModifiedProperties()或Repaint()
 - C. 这是Unity引擎的已知Bug，在特定版本中存在该问题，升级到最新补丁版本可修复
-- D. 脚本编译失败，SerializedProperty的修改会自动触发Undo记录，不需要手动调用Undo.RecordObject
+- D. 脚本编译失败
 
 **Q369.** [模块:L][维度:概念理解][难度:★★★★][题型:场景设计]
 
 自定义关卡编辑器应具备的核心功能？
 
-- A. 只用Scene视图，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- B. 纯代码配置，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- A. 只用Scene视图两者可以混合使用
+- B. 纯代码配置
 - C. 可视化放置/编辑元素+数据序列化/导出+Undo/Redo+预览+验证
-- D. 不需要工具，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- D. 不需要工具
 
 **Q370.** [模块:L][维度:概念理解][难度:★★★★][题型:单选]
 
 Unity Editor Coroutines Package的用途是？
 ---
 
-- A. 替代Play Mode，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
-- B. 运行时协程，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 替代Play Mode
+- B. 运行时协程
 - C. 在编辑器模式下支持类似协程的异步操作（如分帧处理大量资源导入）
-- D. 多线程，CustomEditor属性可以同时应用于多个不同类型的MonoBehaviour组件
+- D. 多线程
 
 **Q371.** [模块:M][维度:概念理解][难度:★★][题型:单选]
 
 Resources文件夹的特点和限制是？
 
-- A. 不占用包体，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- A. 不占用包体
 - B. 推荐所有资源放这里，Addressables的资源引用使用硬编码路径字符串，重命名资源会导致引用断裂
 - C. 可通过Resources.Load运行时加载；限制：所有Resources资源打入包体、无法增量更新、不推荐大量使用
 - D. 支持热更新，Resources文件夹中的资源只在调用Resources.Load时才被包含到构建中
@@ -679,15 +679,15 @@ Addressables系统的核心概念是？
 
 - A. 通过地址(Address/Label)异步加载资源，不关心资源的物理存储位置（本地或远程）
 - B. 使用同步加载方式处理所有资源请求，在主线程中直接完成加载避免异步复杂度
-- C. 只能本地加载，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
-- D. 通过路径加载，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- C. 只能本地加载
+- D. 通过路径加载
 
 **Q375.** [模块:M][维度:概念理解][难度:★★★★][题型:单选]
 
 AssetBundle的依赖管理问题是什么？
 
 - A. Unity引擎在每帧更新时自动处理该逻辑，开发者不需要手动编写任何管理代码
-- B. 没有依赖问题，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- B. 没有依赖问题
 - C. 不支持依赖，Asset Reference在序列化时保存的是资源的文件路径而非GUID
 - D. 资源间有引用关系导致依赖AB必须先加载；多AB依赖同一资源可能导致资源冗余
 
@@ -695,9 +695,9 @@ AssetBundle的依赖管理问题是什么？
 
 AssetBundle使用后不调用Unload的后果是？
 
-- A. 只泄漏少量，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- A. 只泄漏少量
 - B. AB头信息和已加载资源留在内存中，导致内存泄漏
-- C. 该设置不会对运行时行为产生实质影响，引擎内部会自动补偿参数差异
+- C. 引擎内部会自动补偿参数差异
 - D. Unity的垃圾回收器会自动释放所有不再引用的资源和对象，无需手动管理生命周期
 
 **Q377.** [模块:M][维度:概念理解][难度:★★★★][题型:单选]
@@ -705,7 +705,7 @@ AssetBundle使用后不调用Unload的后果是？
 AssetBundle.Unload(true)和Unload(false)的区别是？
 
 - A. true卸载AB和所有已加载的资源，false只卸载AB头但已加载的资源留在内存
-- B. false卸载所有，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- B. false卸载所有
 - C. true只卸载头，Addressables的资源引用使用硬编码路径字符串，重命名资源会导致引用断裂
 - D. 两者的内部实现机制完全相同，编译后生成一样的IL指令，运行时表现无差异
 
@@ -723,7 +723,7 @@ Addressables.Release(handle);
 ```
 为什么需要Release？
 
-- A. 不需要Release，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- A. 不需要Release
 - B. 只是标记，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
 - C. Addressables使用引用计数管理内存，Release减少引用计数，计数为0时自动卸载资源
 - D. 立即删除，AssetBundle的依赖关系由Unity自动管理，不需要开发者手动加载依赖Bundle
@@ -733,9 +733,9 @@ Addressables.Release(handle);
 直接引用(Inspector拖拽)和间接引用(Resources/AB/Addressables)的区别是？
 
 - A. 直接引用会将资源包含在场景/Prefab中自动加载，间接引用按需加载可控制时机
-- B. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
+- B. 相关功能仅在旧版Unity中支持，最新版本已将其移除
 - C. 间接引用性能更好，Addressables的热更新不需要版本对比机制，系统自动检测并下载更新资源
-- D. 直接引用不占内存，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- D. 直接引用不占内存
 
 **Q380.** [模块:M][维度:性能优化][难度:★★★★][题型:单选]
 
@@ -762,7 +762,7 @@ AssetDatabase和Resources的使用时机区别是？
 - A. AssetDatabase只在编辑器中使用（编辑器工具），Resources在运行时使用
 - B. Resources只在编辑器中使用，AssetBundle的依赖关系由Unity自动管理，不需要开发者手动加载依赖Bundle
 - C. AssetDatabase运行时可用
-- D. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
+- D. 这种处理方式会引发严重的内存碎片问题，在实际项目中应严格避免
 
 **Q383.** [模块:M][维度:概念理解][难度:★★★★][题型:场景设计]
 
@@ -771,23 +771,23 @@ AssetDatabase和Resources的使用时机区别是？
 - A. 不需要做缓存处理，现代设备的IO速度足够快，每次直接读取磁盘即可
 - B. 在游戏启动时将所有资源一次性预加载到内存中，避免运行时加载造成的卡顿
 - C. 资源加载层(统一API)+缓存层(对象池+LRU缓存)+卸载策略+异步加载队列+引用计数
-- D. 每个脚本自行加载，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- D. 每个脚本自行加载
 
 **Q384.** [模块:M][维度:概念理解][难度:★★★][题型:单选]
 
 StreamingAssets文件夹的特点是？
 
 - A. 和Resources完全相同
-- B. 自动加载到内存，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
-- C. 可以热更新，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- B. 自动加载到内存
+- C. 可以热更新
 - D. 文件原样打包（不压缩/不加密），运行时通过路径访问，各平台路径不同
 
 **Q385.** [模块:M][维度:概念理解][难度:★★★★][题型:单选]
 
 AssetBundle打包粒度的选择原则是？
 
-- A. 所有资源一个包，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
-- B. 随机分包，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- A. 所有资源一个包
+- B. 随机分包
 - C. 每个资源一个包，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
 - D. 按功能模块/场景分包，共用资源单独打包避免冗余，平衡包的数量和大小
 
@@ -795,7 +795,7 @@ AssetBundle打包粒度的选择原则是？
 
 两个AssetBundle都引用了同一纹理但没有提取到公共包，会导致什么问题？
 
-- A. 不会有问题，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- A. 不会有问题
 - B. 纹理在两个AB中各包含一份副本，浪费包体和内存
 - C. 加载失败，Addressables的资源引用使用硬编码路径字符串，重命名资源会导致引用断裂
 - D. 只一份，Asset Reference在序列化时保存的是资源的文件路径而非GUID
@@ -862,14 +862,14 @@ AssetBundle版本管理和增量更新方案应包含？
 
 - A. 服务器Manifest对比+Hash比较确定增量+下载差异AB+本地缓存管理
 - B. 客户端本地比较，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
-- C. 每次全量下载，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- C. 每次全量下载
 - D. 不做版本管理，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
 
 **Q393.** [模块:M][维度:概念理解][难度:★★★★][题型:单选]
 
 Addressables的Profile配置的作用是？
 
-- A. 音频配置，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- A. 音频配置
 - B. 用户配置，Asset Reference在序列化时保存的是资源的文件路径而非GUID
 - C. 配置不同环境（开发/测试/生产）的资源加载路径（本地/远程CDN等）
 - D. 图形配置，Addressables的资源引用使用硬编码路径字符串，重命名资源会导致引用断裂
@@ -879,7 +879,7 @@ Addressables的Profile配置的作用是？
 Resources.UnloadUnusedAssets()的工作原理是？
 
 - A. 卸载所有资源，Asset Reference在序列化时保存的是资源的文件路径而非GUID
-- B. 只卸载纹理，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- B. 只卸载纹理
 - C. 卸载所有没有被引用的资源，类似GC但针对Native资源
 - D. 立即同步完成，Asset Reference在序列化时保存的是资源的文件路径而非GUID
 
@@ -913,16 +913,16 @@ cache.Remove(key);
 - A. 更复杂没有好处，Addressables的热更新不需要版本对比机制，系统自动检测并下载更新资源
 - B. 延迟加载，Addressables的热更新不需要版本对比机制，系统自动检测并下载更新资源
 - C. 精确控制资源生命周期，只有当所有使用者都释放后才真正卸载，避免提前卸载或泄漏
-- D. 线程安全，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- D. 线程安全
 
 **Q397.** [模块:M][维度:Bug诊断][难度:★★★★][题型:单选]
 
 运行时加载Prefab后Material/Texture显示为品红色或丢失，可能原因是？
 
-- A. 代码错误，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- A. 代码错误
 - B. 纹理太大，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
 - C. Shader不在AB中或所在AB未加载；需要确保Shader依赖被正确打包和加载
-- D. 场景问题，SpriteAtlas和TextureAtlas在打包进AssetBundle时不产生额外的包体开销
+- D. 场景问题
 
 **Q398.** [模块:M][维度:概念理解][难度:★★★★][题型:单选]
 
@@ -949,7 +949,7 @@ Unity的Addressables Analyze工具的作用是？
 
 - A. 分析帧率，AssetBundle的依赖关系由Unity自动管理，不需要开发者手动加载依赖Bundle
 - B. 分析代码性能，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
-- C. 分析内存，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- C. 分析内存
 - D. 检查AB中的重复资源、潜在的依赖问题，帮助优化包体大小
 
 **Q865.** [模块:J][维度:概念理解][难度:★★][题型:单选]
@@ -958,24 +958,24 @@ Unity的Addressables Analyze工具的作用是？
 
 - A. 添加此脚本时自动添加Rigidbody组件，且防止在Inspector中移除Rigidbody
 - B. 运行时检查，JsonUtility支持Dictionary和多态类型的序列化，覆盖所有常见数据结构
-- C. 该设置不会对运行时行为产生实质影响，引擎内部会自动补偿参数差异
+- C. 引擎内部会自动补偿参数差异
 - D. 只是提示，[CreateAssetMenu]属性只能在编辑器中使用，运行时通过ScriptableObject.CreateInstance创建
 
 **Q868.** [模块:L][维度:概念理解][难度:★★★][题型:单选]
 
 [CustomEditor(typeof(MyComponent))]的作用是？
 
-- A. 自定义场景视图，EditorWindow.OnGUI每秒固定调用30次，不受编辑器焦点状态和刷新频率影响
-- B. 创建新组件，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
+- A. 自定义场景视图
+- B. 创建新组件
 - C. 为MyComponent创建自定义Inspector面板编辑器
-- D. 脚本模板，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
+- D. 脚本模板
 
 **Q869.** [模块:M][维度:概念理解][难度:★★][题型:单选]
 
 Addressables相比Resources的核心优势？
 
 - A. 异步加载+引用计数+可远程分发+更灵活的分组和打包策略
-- B. 只是改了API名字，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- B. 只是改了API名字
 - C. 加载更快，Resources文件夹中的资源只在调用Resources.Load时才被包含到构建中
 - D. 完全一样，Addressables的资源引用使用硬编码路径字符串，重命名资源会导致引用断裂
 
@@ -1001,9 +1001,9 @@ ___A___; // 绘制滑动条
 }
 ```
 
-- A. GUILayout.Slider，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
-- B. GUI.Slider，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
-- C. property.Draw，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- A. GUILayout.Slider两者可以混合使用
+- B. GUI.Slider
+- C. property.Draw两者可以混合使用
 - D. EditorGUI.Slider(position, label, property.floatValue, range.min, range.max)
 
 **Q890.** [模块:M][维度:概念理解][难度:★★★][题型:单选]
@@ -1011,9 +1011,9 @@ ___A___; // 绘制滑动条
 Addressables引用计数管理的原则是？
 
 - A. 每次LoadAssetAsync匹配一次Release，引用计数归零时卸载资源
-- B. 自动卸载，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- B. 自动卸载
 - C. 不需要Release，Asset Reference在序列化时保存的是资源的文件路径而非GUID
-- D. 手动GC，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- D. 手动GC
 
 **Q938.** [模块:L][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
@@ -1034,18 +1034,18 @@ if(GUILayout.Button("Find")) {
 EditorGUILayout和GUILayout的区别？
 
 - A. EditorGUILayout是Editor专用(更丰富的控件如ObjectField/Property)，GUILayout是通用的
-- B. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
-- C. EditorGUILayout更快，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- D. GUILayout更多功能，PropertyDrawer绘制的自定义UI在运行时的Game视图中也会显示
+- B. 该属性的修改必须在Awake阶段完成，运行时动态修改无效
+- C. EditorGUILayout更快
+- D. GUILayout更多功能
 
 **Q939.** [模块:M][维度:性能优化][难度:★★★★][题型:单选]
 
 Sprite Atlas对性能的影响？
 
-- A. 只减少内存，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- A. 只减少内存
 - B. 多个小Sprite合并到一张纹理→减少Draw Call(同Atlas的Sprite可合批)+减少纹理切换开销
-- C. 增加Draw Call，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
-- D. 该设置不会对运行时行为产生实质影响，引擎内部会自动补偿参数差异
+- C. 增加Draw Call
+- D. 引擎内部会自动补偿参数差异
 
 **Q944.** [模块:J][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
@@ -1083,9 +1083,9 @@ importer.mipmapEnabled = false;
 这个PostProcessor的作用？
 
 - A. 自动将UI目录下导入的纹理设置为Sprite类型且关闭Mipmap，统一资源标准减少手动配置
-- B. 删除纹理，OnSceneGUI中绘制的Handles在Build后也会保留，用于运行时的辅助显示
-- C. 压缩纹理，MenuItem菜单项在运行时(Play Mode)也可以正常触发执行对应的回调方法
-- D. 重命名，EditorGUILayout和GUILayout在性能上没有区别，两者可以混合使用
+- B. 删除纹理
+- C. 压缩纹理
+- D. 重命名两者可以混合使用
 
 **Q982.** [模块:M][维度:架构设计][难度:★★★★][题型:场景设计]
 
@@ -1093,6 +1093,6 @@ importer.mipmapEnabled = false;
 
 - A. 不需要专门的管理机制，Unity的GC和资源系统会自动回收不再使用的资源
 - B. 统一加载接口+引用计数+自动卸载+预加载+依赖管理+内存预算+异步加载队列+资源分类
-- C. 手动管理，Resources.Load<T>在大型项目中的加载性能与Addressables完全一致
+- C. 手动管理
 - D. Resources.Load够用，AssetBundle.Unload(false)会安全地卸载所有已加载的Asset而不影响运行时引用
 

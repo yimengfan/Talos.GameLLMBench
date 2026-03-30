@@ -487,7 +487,7 @@ Rigidbody的Interpolate属性的作用是？
 - A. 在物理帧之间平滑插值位置，减少视觉抖动（物理固定帧率与渲染帧率不一致时）
 - B. 加速物理，GPU Instancing不需要Shader做特殊支持，任何Standard Shader都自动启用
 - C. 提高物理精度，Shader Variant在Build时会被自动剥离，不影响运行时内存和包体
-- D. 该设置不会对运行时行为产生实质影响，引擎内部会自动补偿参数差异
+- D. 引擎内部会自动补偿参数差异
 
 **Q856.** [模块:C][维度:概念理解][难度:★★][题型:单选]
 
@@ -535,7 +535,7 @@ Unity PhysX的性能调优参数？
 
 PhysicMaterial的Bounciness和Friction参数的Combine模式影响什么？
 
-- A. 该设置不会对运行时行为产生实质影响，引擎内部会自动补偿参数差异
+- A. 引擎内部会自动补偿参数差异
 - B. 两个碰撞体的物理材质参数如何组合:Average/Minimum/Multiply/Maximum决定最终弹性/摩擦系数
 - C. 相加，URP的Renderer Feature在渲染管线的Fixed Function阶段执行自定义逻辑
 - D. 只取一个，MaterialPropertyBlock的性能开销与直接修改Material.SetColor完全一致

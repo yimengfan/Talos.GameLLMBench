@@ -60,6 +60,8 @@ for q_file in "$QUESTIONS_DIR"/questions_*.md; do
     
     key_file="$ANSWER_KEY_DIR/answer_key_$id.md"
     llm_file="$ANSWERS_DIR/llm_answer_$id.txt"
+    short_id=${id%%_*}
+    legacy_llm_file="$ANSWERS_DIR/llm_answer_$short_id.txt"
     
     cat "$q_file" >> "$AGGREGATED_QUESTIONS"
     
@@ -70,16 +72,20 @@ for q_file in "$QUESTIONS_DIR"/questions_*.md; do
     if [ -f "$llm_file" ]; then
         cat "$llm_file" >> "$AGGREGATED_LLM"
         has_answers=1
+    elif [ -f "$legacy_llm_file" ]; then
+        cat "$legacy_llm_file" >> "$AGGREGATED_LLM"
+        has_answers=1
     fi
 done
 
 if [ "$has_answers" -eq 0 ]; then
     echo -e "${RED}错误: 在 $ANSWERS_DIR 目录下未检测到任何有效的答题文件 (llm_answer_*.txt)${NC}"
+    echo -e "${YELLOW}推荐命名: llm_answer_01_core.txt；兼容旧命名: llm_answer_01.txt${NC}"
     rm -rf "$TEMP_DIR"
     exit 1
 fi
 
-TOTAL_ANSWERS=$(grep -cE '^Q[0-9]+\.\s*[A-D]' "$AGGREGATED_LLM" 2>/dev/null || echo 0)
+TOTAL_ANSWERS=$(grep -cEi '^Q[0-9]+\.\s*[A-D]' "$AGGREGATED_LLM" 2>/dev/null || echo 0)
 TOTAL_KEY=$(grep -cE '^\*\*Q[0-9]+\.\*\*\s*[A-D]' "$AGGREGATED_KEY" 2>/dev/null || echo 0)
 
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -91,7 +97,7 @@ echo ""
 
 if [ "$TOTAL_ANSWERS" -eq 0 ]; then
     echo -e "${RED}错误: 未检测到有效答案${NC}"
-    echo -e "${YELLOW}期望格式: Q001. A ｜ 分析内容${NC}"
+    echo -e "${YELLOW}期望格式: Q001. A  或  Q001. A | 分析内容${NC}"
     rm -rf "$TEMP_DIR"
     exit 1
 fi

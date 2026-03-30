@@ -42,6 +42,7 @@ DIFFICULTY_LABELS = {
     "★★": "初级",
     "★★★": "中级",
     "★★★★": "高级",
+    "★★★★★": "专家",
 }
 
 QUESTION_TYPE_MAP = {
@@ -72,7 +73,7 @@ def parse_llm_answers(filepath):
     with open(filepath, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            m = re.match(r"Q(\d+)\.\s*([A-D])\s*\|\s*(.+)", line, re.IGNORECASE)
+            m = re.match(r"Q(\d+)\.\s*([A-D])\s*[|｜]\s*(.+)", line, re.IGNORECASE)
             if m:
                 qnum = int(m.group(1))
                 answers[qnum] = m.group(2).upper()
@@ -144,8 +145,6 @@ def score_answers(answer_key, llm_answers, has_analysis, metadata, detail=False)
 
         if not has_analysis.get(qnum, False):
             no_analysis_list.append((qnum, correct_answer, llm_answer, entry_module))
-            wrong_list.append((qnum, correct_answer, llm_answer, entry_module, "无答题分析"))
-            continue
 
         is_correct = llm_answer == correct_answer
 
@@ -204,7 +203,7 @@ def print_report(result, detail=False):
     print(f"\n{'─' * 60}")
     print(f"  按难度统计")
     print(f"{'─' * 60}")
-    difficulty_order = ["★", "★★", "★★★", "★★★★"]
+    difficulty_order = ["★", "★★", "★★★", "★★★★", "★★★★★"]
     for diff in difficulty_order:
         if diff in stats["by_difficulty"]:
             s = stats["by_difficulty"][diff]
@@ -233,7 +232,7 @@ def print_report(result, detail=False):
 
     if result["no_analysis_list"]:
         print(f"\n{'─' * 60}")
-        print(f"  无答题分析（共 {len(result['no_analysis_list'])} 题，均计为错误）")
+        print(f"  无答题分析（共 {len(result['no_analysis_list'])} 题，仅作信息提示）")
         print(f"{'─' * 60}")
         for qnum, correct_ans, llm_ans, module in result["no_analysis_list"][:50]:
             print(f"  Q{qnum:03d}: 回答={llm_ans}  模块={module}")

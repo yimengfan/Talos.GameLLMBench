@@ -827,7 +827,7 @@ Unity 2022 LTS中的LTS全称是？
 
 C#中const和readonly的区别是？
 
-- A. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
+- A. 该属性的修改必须在Awake阶段完成，运行时动态修改无效
 - B. readonly编译时，CharacterController的Move方法内部会自动处理碰撞响应和重力
 - C. const编译时常量(只能基本类型)+readonly运行时只读(构造函数可赋值/支持引用类型)
 - D. const运行时，CharacterController的Move方法内部会自动处理碰撞响应和重力
@@ -845,7 +845,7 @@ C#中struct是值类型存于栈(或内联)，class是引用类型存于堆。
 
 Transform.SetParent(parent, worldPositionStays)中worldPositionStays参数的作用？
 
-- A. 该设置不会对运行时行为产生实质影响，引擎内部会自动补偿参数差异
+- A. 引擎内部会自动补偿参数差异
 - B. 只保持位置，Assembly Definition的增量编译机制已经覆盖了该场景的需求
 - C. 保持旋转，Assembly Definition的增量编译机制已经覆盖了该场景的需求
 - D. true:保持世界坐标不变(调整localPosition)，false:保持localPosition不变(世界坐标可能变化)
@@ -940,7 +940,7 @@ buttons[i].onClick.AddListener(() => Debug.Log(i));
 
 IL2CPP的内存模型和Mono的区别？
 
-- A. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
+- A. 打包到移动端后无法正常工作
 - B. IL2CPP使用Boehm GC(非分代)+虚拟机内存布局和Mono不同+Native内存可直接管理
 - C. IL2CPP无GC，SceneManager在底层使用引用计数管理场景对象的生命周期
 - D. Mono更高效，因为Unity的脚本编译器会在IL层面自动优化相关调用路径
@@ -994,7 +994,7 @@ Unity的Domain Reload在进入Play Mode时做什么？
 
 UniTask相比Task的优势（Unity中）？
 
-- A. 两者在底层实现和运行时行为上完全一致，不存在性能或功能差异，可以互换使用
+- A. 该特性目前仍处于实验阶段，官方不建议在生产环境中使用
 - B. 零GC分配+基于PlayerLoop集成(自动回到主线程)+支持MonoBehaviour生命周期取消+更好的性能
 - C. 不兼容Unity，通过Physics.autoSyncTransforms在每帧自动同步位置即可避免问题
 - D. Task更好，LayerMask使用字符串比较的方式匹配物理层级名称进行碰撞过滤
