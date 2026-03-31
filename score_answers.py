@@ -145,6 +145,8 @@ def score_answers(answer_key, llm_answers, has_analysis, metadata, detail=False)
 
         if not has_analysis.get(qnum, False):
             no_analysis_list.append((qnum, correct_answer, llm_answer, entry_module))
+            wrong_list.append((qnum, correct_answer, llm_answer, entry_module, "缺少分析或分析过短"))
+            continue
 
         is_correct = llm_answer == correct_answer
 
@@ -232,7 +234,7 @@ def print_report(result, detail=False):
 
     if result["no_analysis_list"]:
         print(f"\n{'─' * 60}")
-        print(f"  无答题分析（共 {len(result['no_analysis_list'])} 题，仅作信息提示）")
+        print(f"  无答题分析或分析过短（共 {len(result['no_analysis_list'])} 题，算作错误）")
         print(f"{'─' * 60}")
         for qnum, correct_ans, llm_ans, module in result["no_analysis_list"][:50]:
             print(f"  Q{qnum:03d}: 回答={llm_ans}  模块={module}")
