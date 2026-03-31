@@ -1,6 +1,8 @@
 # Talos.GameLLMBench
 A benchmark framework for evaluating LLM capabilities in game development.
 
+当前正式题库为连续编号的1000道单选题，范围为Q001-Q1000。
+
 #### 评分标准详解
 - **基础得分**: 每答对一题得 1 分，答错或格式错误 0 分。
 - **答案格式**: 基准格式为 `Q001. A` 这类“题号 + 单个大写字母”输出；评分脚本兼容 `Q001. A | 分析内容` 作为扩展格式，但不要求必须附带分析。
