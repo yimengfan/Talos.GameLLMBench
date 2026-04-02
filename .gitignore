@@ -6,7 +6,8 @@
 ._*
 
 # Custom folder icons
-Icon
+Icon
+
 
 # Volume root files
 .DocumentRevisions-V100
@@ -17,3 +18,4 @@ Icon
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 llm_answer.txt
+score_history/

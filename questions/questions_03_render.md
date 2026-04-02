@@ -87,7 +87,7 @@ TextMeshPro相比Legacy Text的优势是？
 
 **Q172.** [模块:D][维度:概念理解][难度:★★★][题型:单选]
 
-频繁添加/移除LayoutGroup中的子元素会导致什么性能问题？
+频繁添加/移除LayoutGroup中的子元素，最直接的性能开销是什么？
 
 - A. 导致Canvas上所有UI元素（不仅限于LayoutGroup子元素）的Mesh重建
 - B. 触发EventSystem重新扫描所有Raycast Target，导致输入检测卡顿
@@ -495,7 +495,7 @@ PBR(Physically Based Rendering)材质的核心参数是？
 
 **Q214.** [模块:P][维度:性能优化][难度:★★★★][题型:场景设计]
 
-移动端渲染性能优化策略？
+以下哪组更完整地覆盖了移动端常见渲染优化手段？
 
 - A. 移动端和PC端会共享一部分优化原则，但实际瓶颈往往更多集中在带宽、Fill Rate、发热和功耗预算上
 - B. 该场景不需要专门优化，Unity默认设置已经足够高效，过度优化反而增加维护成本
@@ -683,7 +683,7 @@ Screen Space Ambient Occlusion(SSAO)的原理？
 
 **Q234.** [模块:D][维度:性能优化][难度:★★★★][题型:场景设计]
 
-移动端GPU渲染优化需要关注的独特问题？
+移动端GPU渲染优化相比PC更需要额外关注哪些硬件特性和约束？
 
 - A. 只优化CPU，CanvasScaler在Screen Space-Overlay模式下不参与物理分辨率适配
 - B. 和PC端会共享部分渲染原则，但移动端的带宽、Tile-Based Rendering和热降频问题通常更突出

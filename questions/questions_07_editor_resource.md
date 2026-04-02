@@ -648,7 +648,7 @@ Unity Editor Coroutines Package的用途是？
 Resources文件夹的特点和限制是？
 
 - A. 不占用包体
-- B. 使用简单直接，适合少量原型资源或小项目，但不适合大型项目的精细化管理和热更新
+- B. 使用简单直接，适合任何规模项目，并且天然支持细粒度热更新与依赖管理
 - C. 可通过Resources.Load运行时加载；限制：所有Resources资源打入包体、无法增量更新、不推荐大量使用
 - D. 支持热更新，Resources文件夹中的资源只在调用Resources.Load时才被包含到构建中
 
@@ -876,12 +876,12 @@ Addressables的Profile配置的作用是？
 
 **Q489.** [模块:M][维度:概念理解][难度:★★★][题型:单选]
 
-Resources.UnloadUnusedAssets()的工作原理是？
+Resources.UnloadUnusedAssets()最准确的行为是？
 
-- A. 尝试卸载当前没有被场景、脚本或静态引用持有的资源对象，而不是无差别清空全部已加载资源
-- B. 只卸载纹理
-- C. 卸载所有没有被引用的资源，类似GC但针对Native资源
-- D. 这是一个异步清理过程，通常要等引擎遍历引用关系后才能真正完成资源释放
+- A. 立即清空当前进程里所有已加载资源，不考虑是否仍被引用
+- B. 只会清理纹理资源，Mesh和AudioClip不会受影响
+- C. 同步触发C# GC并强制释放所有托管对象
+- D. 遍历引用关系后，尝试释放当前未被场景、脚本或静态引用持有的资源对象
 
 **Q490.** [模块:M][维度:概念理解][难度:★★★★][题型:单选]
 
@@ -889,7 +889,7 @@ Scriptable Build Pipeline(SBP)和Addressables的关系是？
 
 - A. Addressables不使用AB
 - B. Addressables底层使用SBP来构建AssetBundle
-- C. 不是完全独立，但SBP更多负责构建流程抽象，Addressables则负责运行时定位、分组和更新管理
+- C. Addressables只负责运行时加载，和资源构建流程没有关系
 - D. SBP替代Addressables
 
 **Q491.** [模块:M][维度:代码生成/阅读][难度:★★★★][题型:代码生成]

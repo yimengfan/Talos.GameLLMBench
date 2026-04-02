@@ -29,7 +29,7 @@ Unity中GameObject和Component的关系是？
 
 **Q004.** [模块:A][维度:API精确度][难度:★★][题型:单选]
 
-以下获取组件的方式，哪种性能最差且应避免在Update中使用？
+以下获取组件的方式，哪种会先按名称做全场景查找，因此最应避免放在Update中频繁使用？
 
 - A. GetComponent<T>()在每帧调用时（未缓存对象引用情况下）
 - B. GameObject.Find("Name").GetComponent<T>()
@@ -316,9 +316,9 @@ Unity Package Manager(UPM)的作用是？
 
 **Q031.** [模块:A][维度:概念理解][难度:★★★★][题型:场景设计]
 
-设计一个Unity游戏的合理启动流程顺序是？
+以商业项目客户端冷启动到进入主界面为前提，更稳妥的启动流程顺序是？
 
-- A. 框架初始化→配置加载→资源预热→登录/更新检查→进入主界面
+- A. 框架初始化→基础配置加载→登录/更新检查→必要资源预热→进入主界面
 - B. 登录验证→全量资源加载→配置解析→主界面渲染→框架异步初始化
 - C. 主界面立即渲染→异步框架初始化→按需配置加载→延迟登录→资源流式加载
 - D. 资源预热→框架初始化→主界面渲染→后台异步配置加载→延迟登录验证
@@ -484,7 +484,7 @@ Debug.Log("Hit: " + hit.collider.name);
 
 **Q049.** [模块:B][维度:概念理解][难度:★★★][题型:单选]
 
-Rigidbody.AddForce的ForceMode有哪些选项？
+以下哪个是 Rigidbody.AddForce 的合法 ForceMode 选项？
 
 - A. Linear、Angular、Radial、Orbital
 - B. Smooth、Instant、Gradual、Sudden
@@ -598,12 +598,12 @@ cc._____(move * Time.deltaTime);
 
 **Q060.** [模块:B][维度:概念理解][难度:★★★★][题型:单选]
 
-Rigidbody的Collision Detection有哪些模式以及适用场景？
+以下哪项对Unity 3D Rigidbody连续碰撞检测模式的描述是正确的？
 
-- A. Discrete(默认)和Speculative(推测性连续检测)两种模式，ContinuousDynamic已在Unity 2022中移除
-- B. 只有Discrete和Continuous两种模式，区别在于是否对Trigger生效
-- C. Discrete(默认/低速), Continuous(高速物体与静态碰撞), ContinuousDynamic(高速物体间碰撞)
-- D. 只有一种默认模式，碰撞精度通过Solver Iterations参数控制
+- A. Discrete适合普通低速物体；Continuous适合高速物体与静态碰撞体；ContinuousDynamic适合高速动态刚体；ContinuousSpeculative提供更低成本的连续检测
+- B. 只有Discrete和Continuous两种模式，区别只在于是否对Trigger生效
+- C. ContinuousDynamic已在Unity 2022中移除，只剩Discrete和Speculative两种模式
+- D. 所有碰撞检测都只有默认模式，精度完全由Solver Iterations决定
 
 **Q061.** [模块:B][维度:概念理解][难度:★★★★][题型:单选]
 
@@ -625,12 +625,12 @@ CharacterController适合精确控制的角色移动（平台跳跃、FPS），R
 
 **Q063.** [模块:B][维度:概念理解][难度:★★][题型:单选]
 
-直接设置Rigidbody.velocity会有什么影响？
+直接设置Rigidbody.velocity最直接的效果是什么？
 
-- A. 两者都可能让速度快速变化，但一个是直接覆写速度，另一个仍走力的应用流程和物理求解语义
+- A. 会让Rigidbody自动进入Sleep状态，直到下一次AddForce才会恢复运动
 - B. velocity是只读属性，直接赋值会导致编译错误
-- C. 设置velocity后物理引擎会在下一帧自动恢复为碰撞前的速度值
-- D. 覆盖当前速度，可能导致物理模拟不自然（忽略了力的积累和碰撞响应）
+- C. 设置velocity只会改变视觉位置，不会进入物理系统求解
+- D. 直接覆写当前速度，可能忽略力的积累过程，使物理表现显得不自然
 
 **Q064.** [模块:B][维度:API精确度][难度:★★★][题型:单选]
 
@@ -674,7 +674,7 @@ Unity物理系统性能优化的方法包括？
 
 **Q068.** [模块:B][维度:Bug诊断][难度:★★★★][题型:代码阅读]
 
-角色在地面上持续微小抖动/震颤。可能原因是？
+角色使用Rigidbody静止站在平地上时持续出现轻微上下震颤，更常见的原因和缓解方式是？
 
 - A. 地面Collider的法线方向计算错误，需要重新烘焙(Bake)地面的MeshCollider
 - B. Rigidbody的Mass值设置过小（如0.001），导致碰撞力过大引起弹跳
@@ -938,12 +938,12 @@ buttons[i].onClick.AddListener(() => Debug.Log(i));
 
 **Q094.** [模块:A][维度:概念理解][难度:★★★★][题型:单选]
 
-IL2CPP的内存模型和Mono的区别？
+IL2CPP和Mono在运行时行为上的关键差异是？
 
-- A. 两者都运行托管对象和GC，但运行时实现、对象布局细节、AOT/JIT环境以及可直接控制的Native边界并不完全一致
-- B. IL2CPP使用Boehm GC(非分代)+虚拟机内存布局和Mono不同+Native内存可直接管理
-- C. IL2CPP没有垃圾回收机制，所有托管对象都转成原生对象后由C++手动释放
-- D. Mono在所有平台上都比IL2CPP更高效，因为JIT总能优于AOT生成代码
+- A. 两者都运行托管对象并依赖GC，但IL2CPP是AOT转C++、运行时实现和对象布局细节与Mono并不完全相同
+- B. IL2CPP在所有平台上都固定使用同一种GC实现，并允许开发者直接控制托管对象的底层内存布局
+- C. IL2CPP没有垃圾回收机制，所有托管对象都需要开发者手动释放
+- D. Mono在所有平台上都必然比IL2CPP更高效，因为JIT一定优于AOT
 
 **Q095.** [模块:B][维度:代码生成/阅读][难度:★★★★][题型:代码阅读]
 

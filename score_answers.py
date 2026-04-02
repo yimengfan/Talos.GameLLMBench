@@ -4,6 +4,128 @@ import re
 import sys
 from collections import defaultdict
 
+QUESTION_HEADER_RE = re.compile(
+    r"\*\*Q(\d+)\.\*\*\s*\[模块:([^\]]+)\]\[维度:([^\]]+)\]\[难度:([^\]]+)\]\[题型:([^\]]+)\]"
+)
+OPTION_RE = re.compile(r"-\s*([A-D])\.\s*(.+)")
+
+ASCII_STOPWORDS = {
+    "true",
+    "false",
+    "null",
+    "void",
+    "int",
+    "float",
+    "string",
+    "bool",
+    "var",
+    "new",
+    "out",
+    "ref",
+    "get",
+    "set",
+    "the",
+    "and",
+    "for",
+    "with",
+    "from",
+    "that",
+    "this",
+    "only",
+    "mode",
+    "value",
+    "values",
+}
+
+SCENARIO_CONSTRAINT_TERMS = [
+    "架构",
+    "分层",
+    "流程",
+    "约束",
+    "前提",
+    "初始化",
+    "主界面",
+    "模块",
+    "系统",
+    "事件驱动",
+    "树形结构",
+    "导航网格",
+    "运行时",
+    "增量更新",
+    "工具链",
+    "自动化测试",
+    "分包",
+    "公共资源",
+    "冗余依赖",
+    "单元测试",
+    "集成测试",
+    "端到端",
+    "界面栈",
+    "资源加载",
+    "动画管理",
+    "消息解耦",
+    "服务器权威",
+    "事务一致性",
+    "日志审计",
+    "回滚机制",
+    "性能预算",
+    "固定测试场景",
+    "录制回放",
+    "CI",
+    "告警",
+    "阻断合入",
+]
+
+GLOBAL_TECH_TERMS = [
+    "生命周期",
+    "Awake",
+    "Start",
+    "Update",
+    "LateUpdate",
+    "FixedUpdate",
+    "Rigidbody",
+    "Collider",
+    "CharacterController",
+    "LayerMask",
+    "NavMesh",
+    "Addressables",
+    "AssetBundle",
+    "ScriptableObject",
+    "SerializeReference",
+    "Resources",
+    "UnloadUnusedAssets",
+    "InputAction",
+    "Input Debugger",
+    "compositionString",
+    "Canvas",
+    "LayoutGroup",
+    "TextMeshPro",
+    "AudioMixer",
+    "Cinemachine",
+    "Timeline",
+    "Playable",
+    "DOTS",
+    "Burst",
+    "NativeArray",
+    "Job",
+    "GC",
+    "AOT",
+    "IL2CPP",
+    "HybridCLR",
+    "版本",
+    "依赖",
+    "引用计数",
+    "异步",
+    "预加载",
+    "碰撞",
+    "渲染",
+    "输入",
+    "热更新",
+    "构建",
+    "性能",
+    "优化",
+]
+
 MODULE_MAP = {
     "A": "核心架构",
     "B": "C#与脚本编程",
@@ -69,7 +191,7 @@ def parse_answer_key(filepath):
 
 def parse_llm_answers(filepath):
     answers = {}
-    has_analysis = {}
+    analyses = {}
     with open(filepath, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
@@ -77,42 +199,140 @@ def parse_llm_answers(filepath):
             if m:
                 qnum = int(m.group(1))
                 answers[qnum] = m.group(2).upper()
-                analysis = m.group(3).strip()
-                has_analysis[qnum] = len(analysis) >= 20
+                analyses[qnum] = m.group(3).strip()
             else:
                 m2 = re.match(r"Q(\d+)\.\s*([A-D])\s*$", line, re.IGNORECASE)
                 if m2:
                     qnum = int(m2.group(1))
                     answers[qnum] = m2.group(2).upper()
-                    has_analysis[qnum] = False
-    return answers, has_analysis
+                    analyses[qnum] = ""
+    return answers, analyses
 
 
-def parse_question_metadata(filepath):
-    metadata = {}
-    with open(filepath, "r", encoding="utf-8") as f:
-        content = f.read()
+def extract_keywords(text):
+    ascii_tokens = {
+        token.lower()
+        for token in re.findall(r"[A-Za-z_][A-Za-z0-9_<>.]{2,}", text)
+        if token.lower() not in ASCII_STOPWORDS
+    }
+    phrase_tokens = {term for term in GLOBAL_TECH_TERMS if term in text}
+    chinese_phrases = {
+        phrase
+        for phrase in re.findall(r"[\u4e00-\u9fff]{3,}", text)
+        if len(phrase) >= 3
+    }
+    return ascii_tokens | phrase_tokens | chinese_phrases
 
-    pattern = re.compile(
-        r"\*\*Q(\d+)\.\*\*\s*\[模块:([^\]]+)\]\[维度:([^\]]+)\]\[难度:([^\]]+)\]\[题型:([^\]]+)\]"
-    )
-    for m in pattern.finditer(content):
-        qnum = int(m.group(1))
-        metadata[qnum] = {
-            "module": m.group(2),
-            "dimension": m.group(3),
-            "difficulty": m.group(4),
-            "qtype": m.group(5),
+
+def parse_question_bank(filepath, answer_key):
+    question_bank = {}
+
+    def flush_question(current_qnum, current_meta, block_lines):
+        if current_qnum is None:
+            return
+
+        options = {}
+        stem_lines = []
+        options_started = False
+
+        for raw_line in block_lines:
+            stripped = raw_line.strip()
+            option_match = OPTION_RE.match(stripped)
+            if option_match:
+                options_started = True
+                options[option_match.group(1)] = option_match.group(2).strip()
+                continue
+            if not options_started:
+                stem_lines.append(stripped)
+
+        correct_option = answer_key.get(current_qnum, "")
+        correct_option_text = options.get(correct_option, "")
+        keyword_source = "\n".join(stem_lines + [correct_option_text])
+
+        question_bank[current_qnum] = {
+            **current_meta,
+            "stem": "\n".join(stem_lines).strip(),
+            "options": options,
+            "correct_option_text": correct_option_text,
+            "keywords": extract_keywords(keyword_source),
         }
-    return metadata
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        current_qnum = None
+        current_meta = None
+        block_lines = []
+
+        for line in f:
+            match = QUESTION_HEADER_RE.match(line.strip())
+            if match:
+                flush_question(current_qnum, current_meta, block_lines)
+                current_qnum = int(match.group(1))
+                current_meta = {
+                    "module": match.group(2),
+                    "dimension": match.group(3),
+                    "difficulty": match.group(4),
+                    "qtype": match.group(5),
+                }
+                block_lines = []
+            elif current_qnum is not None:
+                block_lines.append(line.rstrip("\n"))
+
+        flush_question(current_qnum, current_meta, block_lines)
+
+    return question_bank
 
 
-def score_answers(answer_key, llm_answers, has_analysis, metadata, detail=False):
+def validate_analysis(question_info, analysis):
+    analysis = analysis.strip()
+    if len(analysis) < 20:
+        return False, "缺少分析或分析过短"
+
+    analysis_lower = analysis.lower()
+    keyword_hits = 0
+    for keyword in question_info.get("keywords", set()):
+        if any("a" <= ch.lower() <= "z" or ch.isdigit() for ch in keyword):
+            if keyword in analysis_lower:
+                keyword_hits += 1
+        elif keyword in analysis:
+            keyword_hits += 1
+
+    global_hits = sum(1 for term in GLOBAL_TECH_TERMS if term in analysis)
+    scenario_constraint_hits = sum(1 for term in SCENARIO_CONSTRAINT_TERMS if term in analysis)
+    has_code_signal = bool(re.search(r"[A-Za-z_][A-Za-z0-9_<>.()]{2,}", analysis))
+    qtype = question_info.get("qtype", "")
+    has_question_keywords = bool(question_info.get("keywords"))
+
+    if qtype in {"代码补全", "代码生成", "代码阅读"}:
+        if keyword_hits >= 1 or (has_code_signal and has_question_keywords):
+            return True, ""
+        return False, "分析未引用关键API/代码点"
+
+    if qtype == "场景设计":
+        if keyword_hits >= 2:
+            return True, ""
+        if not has_question_keywords and (global_hits >= 2 or scenario_constraint_hits >= 2):
+            return True, ""
+        if keyword_hits >= 1 and scenario_constraint_hits >= 1:
+            return True, ""
+        if scenario_constraint_hits >= 3:
+            return True, ""
+        return False, "分析未体现方案关键约束"
+
+    if keyword_hits >= 1 or (not has_question_keywords and (global_hits >= 1 or has_code_signal)):
+        return True, ""
+
+    return False, "分析未引用关键技术点"
+
+
+def score_answers(answer_key, llm_answers, analyses, question_bank, strict_analysis=True):
     total = len(answer_key)
-    correct = 0
+    answered = 0
+    choice_correct = 0
+    analysis_valid = 0
+    benchmark_correct = 0
     wrong_list = []
     unanswered = []
-    no_analysis_list = []
+    low_quality_analysis_list = []
 
     stats = {
         "by_module": defaultdict(lambda: {"correct": 0, "total": 0}),
@@ -123,7 +343,7 @@ def score_answers(answer_key, llm_answers, has_analysis, metadata, detail=False)
 
     for qnum in sorted(answer_key.keys()):
         correct_answer = answer_key[qnum]
-        meta = metadata.get(qnum, {})
+        meta = question_bank.get(qnum, {})
 
         entry_module = MODULE_MAP.get(meta.get("module", ""), meta.get("module", "未知"))
         entry_dimension = meta.get("dimension", "未知")
@@ -141,44 +361,62 @@ def score_answers(answer_key, llm_answers, has_analysis, metadata, detail=False)
             unanswered.append(qnum)
             continue
 
+        answered += 1
         llm_answer = llm_answers[qnum]
-
-        if not has_analysis.get(qnum, False):
-            no_analysis_list.append((qnum, correct_answer, llm_answer, entry_module))
-            wrong_list.append((qnum, correct_answer, llm_answer, entry_module, "缺少分析或分析过短"))
-            continue
+        analysis = analyses.get(qnum, "")
+        analysis_ok, analysis_reason = validate_analysis(meta, analysis) if strict_analysis else (True, "")
 
         is_correct = llm_answer == correct_answer
-
         if is_correct:
-            correct += 1
+            choice_correct += 1
+        if analysis_ok:
+            analysis_valid += 1
+
+        if is_correct and analysis_ok:
+            benchmark_correct += 1
             stats["by_module"][entry_module]["correct"] += 1
             stats["by_dimension"][entry_dimension]["correct"] += 1
             stats["by_difficulty"][entry_difficulty]["correct"] += 1
             stats["by_qtype"][mapped_qtype]["correct"] += 1
         else:
-            wrong_list.append((qnum, correct_answer, llm_answer, entry_module, "答案错误"))
+            reasons = []
+            if not is_correct:
+                reasons.append("答案错误")
+            if not analysis_ok:
+                reasons.append(analysis_reason)
+                low_quality_analysis_list.append((qnum, llm_answer, entry_module, analysis_reason))
+            wrong_list.append((qnum, correct_answer, llm_answer, entry_module, "；".join(reasons)))
 
     return {
         "total": total,
-        "correct": correct,
+        "answered": answered,
+        "choice_correct": choice_correct,
+        "analysis_valid": analysis_valid,
+        "benchmark_correct": benchmark_correct,
         "wrong_list": wrong_list,
         "unanswered": unanswered,
-        "no_analysis_list": no_analysis_list,
+        "low_quality_analysis_list": low_quality_analysis_list,
         "stats": stats,
     }
 
 
 def print_report(result, detail=False):
     total = result["total"]
-    correct = result["correct"]
-    accuracy = correct / total * 100 if total > 0 else 0
+    benchmark_correct = result["benchmark_correct"]
+    choice_correct = result["choice_correct"]
+    answered = result["answered"]
+    analysis_valid = result["analysis_valid"]
+    benchmark_accuracy = benchmark_correct / total * 100 if total > 0 else 0
+    choice_accuracy = choice_correct / total * 100 if total > 0 else 0
+    analysis_rate = analysis_valid / answered * 100 if answered > 0 else 0
 
     print("=" * 60)
     print(f"  Unity3D LLM 评测报告")
     print("=" * 60)
-    print(f"\n  总分: {correct}/{total}  正确率: {accuracy:.1f}%")
-    print(f"  答对: {correct}  答错: {len(result['wrong_list'])}  未答: {len(result['unanswered'])}")
+    print(f"\n  综合基准分: {benchmark_correct}/{total}  综合正确率: {benchmark_accuracy:.1f}%")
+    print(f"  客观选项得分: {choice_correct}/{total}  选项正确率: {choice_accuracy:.1f}%")
+    print(f"  分析合格数: {analysis_valid}/{answered}  分析合格率: {analysis_rate:.1f}%")
+    print(f"  综合答对: {benchmark_correct}  综合答错: {len(result['wrong_list'])}  未答: {len(result['unanswered'])}")
 
     stats = result["stats"]
 
@@ -232,14 +470,14 @@ def print_report(result, detail=False):
         if len(result["wrong_list"]) > 50:
             print(f"  ... 还有 {len(result['wrong_list']) - 50} 题未显示")
 
-    if result["no_analysis_list"]:
+    if result["low_quality_analysis_list"]:
         print(f"\n{'─' * 60}")
-        print(f"  无答题分析或分析过短（共 {len(result['no_analysis_list'])} 题，算作错误）")
+        print(f"  分析不合格（共 {len(result['low_quality_analysis_list'])} 题，算作综合评分错误）")
         print(f"{'─' * 60}")
-        for qnum, correct_ans, llm_ans, module in result["no_analysis_list"][:50]:
-            print(f"  Q{qnum:03d}: 回答={llm_ans}  模块={module}")
-        if len(result["no_analysis_list"]) > 50:
-            print(f"  ... 还有 {len(result['no_analysis_list']) - 50} 题未显示")
+        for qnum, llm_ans, module, reason in result["low_quality_analysis_list"][:50]:
+            print(f"  Q{qnum:03d}: 回答={llm_ans}  模块={module}  原因={reason}")
+        if len(result["low_quality_analysis_list"]) > 50:
+            print(f"  ... 还有 {len(result['low_quality_analysis_list']) - 50} 题未显示")
 
     if result["unanswered"]:
         print(f"\n{'─' * 60}")
@@ -259,6 +497,7 @@ def main():
     parser.add_argument("--llm", required=True, help="LLM 答题文件路径 (llm_answer.txt)")
     parser.add_argument("--questions", default="questions.md", help="题库文件路径 (用于提取元数据)")
     parser.add_argument("--detail", action="store_true", help="显示错误详情")
+    parser.add_argument("--choice-only", action="store_true", help="兼容旧版，仅按选项字母评分")
     args = parser.parse_args()
 
     answer_key = parse_answer_key(args.answer)
@@ -266,16 +505,22 @@ def main():
         print(f"错误: 无法从 {args.answer} 解析答案密钥", file=sys.stderr)
         sys.exit(1)
 
-    llm_answers, has_analysis = parse_llm_answers(args.llm)
+    llm_answers, analyses = parse_llm_answers(args.llm)
     if not llm_answers:
         print(f"错误: 无法从 {args.llm} 解析LLM答案", file=sys.stderr)
         sys.exit(1)
 
-    metadata = parse_question_metadata(args.questions)
-    if not metadata:
+    question_bank = parse_question_bank(args.questions, answer_key)
+    if not question_bank:
         print(f"警告: 无法从 {args.questions} 解析题目元数据，将跳过分维度统计", file=sys.stderr)
 
-    result = score_answers(answer_key, llm_answers, has_analysis, metadata, detail=args.detail)
+    result = score_answers(
+        answer_key,
+        llm_answers,
+        analyses,
+        question_bank,
+        strict_analysis=not args.choice_only,
+    )
     print_report(result, detail=args.detail)
 
 

@@ -185,24 +185,24 @@ ClampMagnitude的作用？
 在FixedUpdate中检测Input.GetKeyDown可能丢失输入，因为FixedUpdate和Update调用频率不同。
 
 - A. 正确，在FixedUpdate中检测Input.GetKeyDown可能丢失输入，因为调用频率不同
-- B. Unity会自动处理输入缓冲，不会丢失任何输入
-- C. FixedUpdate和Update的调用频率相同，不会丢失输入
-- D. Input.GetKeyDown在FixedUpdate中更准确
+- B. 只要物理步长足够小，就一定不会错过任何按下瞬间
+- C. FixedUpdate和Update读取的是完全相同的一次输入采样结果
+- D. Input.GetKeyDown本来就只应该在FixedUpdate中读取，避免帧率波动
 
 **Q525.** [模块:N][维度:概念理解][难度:★★★★][题型:单选]
 
 Input System的On-Screen Button/Stick的原理是？
 
-- A. 替代所有输入
-- B. 独立于Input System，新Input System不支持多设备同时输入，同一时间只能识别一个活动输入设备
-- C. 只用于调试，新Input System不支持多设备同时输入，同一时间只能识别一个活动输入设备
+- A. 绕过Input System直接修改Transform或角色状态，不经过Action/Control绑定
+- B. 只在编辑器模拟触控，正式移动端不会真正生成输入事件
+- C. 把所有触摸统一转换成鼠标左键事件，因此无法映射到自定义Action
 - D. 将UI交互事件模拟为对应设备的输入（如触摸屏幕按钮模拟为键盘按键或手柄按钮）
 
 **Q526.** [模块:N][维度:概念理解][难度:★★★★][题型:单选]
 
 Input System使用的最佳实践包括？
 
-- A. 使用Input Action和Input Action Map
+- A. 使用Input Action / Action Map组织输入，并按玩家或场景拆分Control Scheme
 - B. 在Update中每帧检测Input.GetKey以保证响应及时
 - C. 将所有输入检测都放在FixedUpdate中以获得稳定的响应
 - D. 使用旧的Input Manager和新Input System混合可以提高兼容性
@@ -211,14 +211,14 @@ Input System使用的最佳实践包括？
 
 识别滑动手势(Swipe)通常需要检测什么？
 
-- A. 只检测起点，PlayerInput组件的Invoke Unity Events模式性能优于C# Generate Class方式
+- A. 只检测触摸开始位置即可，方向和距离可以在业务层固定写死
 - B. 只要手指离开屏幕就可视为一次滑动，不需要判断方向、距离和持续时间
-- C. 只检测时间
+- C. 只检测按下持续时间，位移大小不会影响Swipe判定
 - D. 触摸起点和终点的距离、方向、时间差，满足阈值则判定为对应方向的滑动
 
 **Q528.** [模块:N][维度:概念理解][难度:★★★★][题型:单选]
 
-Input System Debugger(Window→Analysis→Input Debugger)可以查看什么？
+Input System Debugger(Window→Analysis→Input Debugger)最完整的可观察信息包括什么？
 
 - A. 主要看设备树和状态事件流，便于确认某个按键、摇杆或触摸输入是否真的被系统识别到
 - B. 在多线程环境下直接调用该接口会导致主线程阻塞或程序崩溃
@@ -239,18 +239,18 @@ Input System事件驱动相比旧版每帧轮询的性能优势是？
 本地多人游戏(Local Co-op)的输入处理方案是？
 
 - A. 每个玩家分配独立的PlayerInput组件+不同的Control Scheme+设备自动分配
-- B. 需要网络，InputAction的canceled回调只在长按操作释放时触发，短按不会触发该回调
+- B. 所有玩家共用同一个PlayerInput最简单，设备输入不需要做配对和隔离
 - C. 如果设备数量很少会比较麻烦，但本地多人仍可通过设备配对和独立Action Map实现
 - D. 也可以共用一套输入资源，但通常仍需要在运行时为不同玩家拆分设备和动作上下文
 
 **Q531.** [模块:N][维度:概念理解][难度:★★★][题型:单选]
 
-Unity中处理中文/日文等IME输入需要注意什么？
+自定义文本输入框处理中文/日文等IME输入时，额外需要关注什么？
 
-- A. 不支持中文，PlayerInput组件的Invoke Unity Events模式性能优于C# Generate Class方式
-- B. Input Field组件自动处理IME，但自定义文本输入需要处理Input.compositionString
-- C. 不一定非要第三方插件，但如果自定义输入框较复杂，通常仍要自己处理组合串、候选词和提交时机
-- D. 所有IME输入最终都会自动转换成普通KeyDown事件，因此不需要处理组合中的候选字符串
+- A. Unity运行时不支持中文和日文IME输入，只能依赖第三方插件完全接管键盘
+- B. 需要处理 Input.compositionString 等组合输入状态，而不只是最终提交字符
+- C. 所有IME输入最终都会自动转换成普通KeyDown事件，因此无需处理候选词或组合串
+- D. 新Input System会自动帮自定义输入框处理候选词UI和提交时机，无需额外逻辑
 
 **Q532.** [模块:N][维度:代码生成/阅读][难度:★★★★][题型:代码生成]
 
@@ -265,7 +265,7 @@ moveAction.started += ctx => { /* 输入开始 */ };
 - A. started、performed、canceled只是不同命名的同一个回调阶段，触发时机完全一致
 - B. canceled只在设备断开时触发，普通按键松开和交互中断不会进入该阶段
 - C. started=输入刚开始，performed=交互完成/值变化，canceled=输入停止/Interaction未完成
-- D. 只有performed有用，PlayerInput组件的Invoke Unity Events模式性能优于C# Generate Class方式
+- D. 只有performed有业务意义，started和canceled通常不会在Action回调中触发
 
 **Q533.** [模块:N][维度:概念理解][难度:★★★★][题型:单选]
 
@@ -274,7 +274,7 @@ moveAction.started += ctx => { /* 输入开始 */ };
 - A. 只能通过各平台原生SDK桥接，Unity的输入层不暴露这些传感器数据
 - B. Input.gyro(旧版)或Input System的GravitySensor/Gyroscope设备
 - C. Unity 2022 LTS不支持该功能，需要等待后续版本更新或使用第三方插件替代
-- D. 只能用第三方，PlayerInput组件的Invoke Unity Events模式性能优于C# Generate Class方式
+- D. 只能通过UI事件间接推导，运行时无法直接读取设备传感器值
 
 **Q534.** [模块:N][维度:Bug诊断][难度:★★★★][题型:单选]
 

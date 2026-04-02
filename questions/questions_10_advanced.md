@@ -1061,7 +1061,7 @@ CinemachineStateDrivenCamera的用途是？
 
 Cinemachine常用的扩展组件包括？
 
-- A. Camera、Camera2D、Camera3D、CameraVR
+- A. Composer、FramingTransposer、CinemachineCollider、CinemachineImpulseListener
 - B. View、Projection、Transform、Render
 - C. CinemachineBrain、CinemachineVirtualCamera
 - D. CinemachineInput、CinemachineOutput、CinemachineFilter、CinemachineMixer
